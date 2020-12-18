@@ -1,0 +1,42 @@
+//Would want to use imagecreatefromgif or imagecreatefrompng, depending on file type.
+//Loading up the image so we can get it's dimensions and determine the proper size.
+$maxsize = 150;
+$img = imagecreatefromjpeg("$jpgimage"); 
+
+
+$width = imagesx($img);
+$height = imagesy($img); //Get height and width
+
+//This stuff figures out the ratio to reduce the shortest side by by using the longest side, since 
+//the longest side will be the new maximum length
+if ($height > $width) 
+{   
+$ratio = $maxsize / $height;  
+$newheight = $maxsize;
+$newwidth = $width * $ratio; 
+{
+else 
+{
+$ratio = $maxsize / $width;   
+$newwidth = $maxsize;  
+$newheight = $height * $ratio;   
+}
+
+//create new image resource to hold the resized image
+$newimg = imagecreatetruecolor($newwidth,$newheight); 
+
+$palsize = ImageColorsTotal($img);  //Get palette size for original image
+for ($i = 0; $i < $palsize; $i++) //Assign color palette to new image
+{ 
+$colors = ImageColorsForIndex($img, $i);   
+ImageColorAllocate($newimg, $colors['red'], $colors['green'], $colors['blue']);
+} 
+
+//copy original image into new image at new size.
+imagecopyresized($newimg, $img, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+
+//Get a color for the circle, in this case white.
+$circlecol = imagecolorallocate($newimg,255,255,255);
+//draw circle at center point, or as close to center as possible, with a width and height of 150
+//use imagefilledellipse for a filled circle
+imageellipse($newimg, round($newwidth / 2), round($newheight / 2), 150, 150, $circlecol);
